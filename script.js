@@ -19,65 +19,49 @@ window.addEventListener("click", (e) => {
 
 // Handle form submission
 document.getElementById("registrationForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+  e.preventDefault(); // Prevent default form submission behavior
 
+  // Gather form data
   const data = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    contact: document.getElementById("contact").value,
-    college: document.getElementById("college").value,
-    branch: document.getElementById("branch").value,
-    year: document.getElementById("year").value,
+    name: document.getElementById("name").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    contact: document.getElementById("contact").value.trim(),
+    college: document.getElementById("college").value.trim(),
+    branch: document.getElementById("branch").value.trim(),
+    year: document.getElementById("year").value.trim(),
   };
 
-  const scriptURL = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // Replace with your Web App URL
+  // Replace this with your Google Apps Script Web App URL
+  const scriptURL = "https://script.google.com/macros/s/AKfycbw8N_EOLHOYKjZyCFF01kfIqNvk1BtSu74XE82rEcFM3fjyVJ2lw3MlSTrCp-hmA_EHNg/exec";
 
   try {
+    // Validate form data
+    if (!data.name || !data.email || !data.contact || !data.college || !data.branch || !data.year) {
+      alert("All fields are required. Please fill out the form completely.");
+      return;
+    }
+
+    // Send data to Apps Script endpoint
     const response = await fetch(scriptURL, {
       method: "POST",
       body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json", // Ensure JSON format
+      },
     });
 
+    // Parse the response
     const result = await response.json();
+
+    // Handle success or error from server
     if (result.status === "success") {
       alert("Registration Successful!");
-      popupForm.style.display = "none";
+      popupForm.style.display = "none"; // Close the popup form
+      document.getElementById("registrationForm").reset(); // Reset form
     } else {
-      throw new Error(result.message);
+      throw new Error(result.message); // Handle server error
     }
   } catch (error) {
-    alert("Error: " + error.message);
-  }
-});
-document.getElementById("registrationForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
-
-  const data = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    contact: document.getElementById("contact").value,
-    college: document.getElementById("college").value,
-    branch: document.getElementById("branch").value,
-    year: document.getElementById("year").value,
-  };
-
-  const scriptURL = "https://script.google.com/macros/s/AKfycbzsuHf7vfdJdYH_-FmmGwDRrVkUifktvwdvJBKeDRok0wbNV1JrDXrlW_rwAQCzQkKqSQ/exec"; 
-
-  try {
-    const response = await fetch(scriptURL, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const result = await response.json();
-    if (result.status === "success") {
-      alert("Registration Successful!");
-    } else {
-      throw new Error(result.message);
-    }
-  } catch (error) {
-    alert("Error: " + error.message);
+    alert("Error: " + error.message); // Display error to the user
   }
 });
